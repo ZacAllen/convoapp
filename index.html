@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>convoapp</title>
+<meta name="description" content="Timed small-talk prompts for practising conversational fluency out loud.">
+<meta name="theme-color" content="#14161a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="convoapp">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Home -->
+<section id="screen-home" class="screen" aria-labelledby="home-title">
+  <div class="stack">
+    <header class="brand">
+      <h1 id="home-title">convoapp</h1>
+      <p class="tagline">Answer out loud. Tap for the next one.</p>
+    </header>
+    <button id="start" class="primary">Start a run</button>
+    <p id="run-shape" class="meta"></p>
+    <button id="open-settings" class="link">Settings</button>
+  </div>
+</section>
+
+<!-- A card in play. The whole section is the advance target. -->
+<section id="screen-card" class="screen" hidden aria-labelledby="prompt">
+  <button id="quit" class="corner" type="button">End run</button>
+  <p id="progress" class="corner corner--left" aria-live="off"></p>
+  <p id="prompt" class="prompt" aria-live="assertive"></p>
+  <p class="hint">Tap anywhere for the next card · long-press to hear it again</p>
+</section>
+
+<!-- Summary -->
+<section id="screen-summary" class="screen screen--scroll" hidden aria-labelledby="summary-title">
+  <div class="stack stack--wide">
+    <h2 id="summary-title">Run complete</h2>
+    <p id="summary-headline" class="meta"></p>
+    <ol id="summary-list" class="results"></ol>
+    <button id="again" class="primary">Run again</button>
+    <button id="summary-home" class="link">Done</button>
+  </div>
+</section>
+
+<!-- Settings -->
+<section id="screen-settings" class="screen screen--scroll" hidden aria-labelledby="settings-title">
+  <div class="stack stack--wide">
+    <h2 id="settings-title">Settings</h2>
+
+    <fieldset>
+      <legend>Cards per run</legend>
+      <div id="count-options" class="choices"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Voice</legend>
+      <label class="row">
+        <input type="checkbox" id="speak-toggle">
+        <span>Speak the prompt aloud</span>
+      </label>
+      <select id="voice-select" aria-label="Voice"></select>
+      <p id="voice-note" class="meta"></p>
+    </fieldset>
+
+    <button id="settings-done" class="primary">Done</button>
+  </div>
+</section>
+
+<script src="prompts.js"></script>
+<script src="settings.js"></script>
+<script src="deck.js"></script>
+<script src="speech.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

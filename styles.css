@@ -1,0 +1,278 @@
+/* convoapp — one screen at a time, thumb-sized targets, dark by default. */
+
+:root {
+  --bg: #14161a;
+  --surface: #1d2026;
+  --line: #2c313a;
+  --ink: #eef1f5;
+  --ink-dim: #9aa3b0;
+  --accent: #6ea8fe;
+  --accent-ink: #0b1220;
+  --slow: #f0a76a;
+
+  --pad: 20px;
+  --radius: 14px;
+  --tap: 52px;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --line: #dfe3e9;
+    --ink: #161a20;
+    --ink-dim: #5d6673;
+    --accent: #1a5fd0;
+    --accent-ink: #ffffff;
+    --slow: #a8600f;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Screens ------------------------------------------------------------------ */
+
+.screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(var(--pad), env(safe-area-inset-top))
+           max(var(--pad), env(safe-area-inset-right))
+           max(var(--pad), env(safe-area-inset-bottom))
+           max(var(--pad), env(safe-area-inset-left));
+}
+
+.screen--scroll {
+  align-items: flex-start;
+  overflow-y: auto;
+  padding-top: max(32px, env(safe-area-inset-top));
+}
+
+[hidden] { display: none !important; }
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+}
+
+.stack--wide { max-width: 520px; text-align: left; }
+
+/* Home -------------------------------------------------------------------- */
+
+.brand h1 {
+  margin: 0;
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+}
+
+.tagline, .meta {
+  margin: 6px 0 0;
+  color: var(--ink-dim);
+  font-size: 0.9rem;
+}
+
+/* The card ---------------------------------------------------------------- */
+
+#screen-card {
+  cursor: pointer;
+  flex-direction: column;
+  gap: 28px;
+  /* A tap here means "next card" — never a text selection or a double-tap zoom. */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.prompt {
+  margin: 0;
+  max-width: 22ch;
+  font-size: clamp(1.75rem, 8vw, 2.75rem);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.hint {
+  margin: 0;
+  color: var(--ink-dim);
+  font-size: 0.8rem;
+  text-align: center;
+  opacity: 0.75;
+}
+
+.corner {
+  position: absolute;
+  top: max(var(--pad), env(safe-area-inset-top));
+  right: max(var(--pad), env(safe-area-inset-right));
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-dim);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.corner--left {
+  left: max(var(--pad), env(safe-area-inset-left));
+  right: auto;
+  border-color: transparent;
+  background: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Summary ----------------------------------------------------------------- */
+
+.results {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.results li {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.results .text { flex: 1; font-size: 0.95rem; }
+
+.results .time {
+  color: var(--ink-dim);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.results li.is-slowest { border-color: var(--slow); }
+.results li.is-slowest .time { color: var(--slow); font-weight: 600; }
+
+/* Controls ---------------------------------------------------------------- */
+
+button {
+  font: inherit;
+}
+
+.primary {
+  min-height: var(--tap);
+  padding: 0 22px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.link {
+  min-height: 44px;
+  border: none;
+  background: none;
+  color: var(--ink-dim);
+  font-size: 0.9rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+fieldset {
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+legend {
+  padding: 0 6px;
+  color: var(--ink-dim);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.choices button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.choices button[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.row input { width: 20px; height: 20px; accent-color: var(--accent); }
+
+select {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 10px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+}
+
+select:disabled { opacity: 0.5; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .prompt { animation: rise 180ms ease-out; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: none; }
+  }
+}
