@@ -30,10 +30,12 @@
   // --- The run ------------------------------------------------------------
 
   function startRun() {
-    const { cardCount } = Settings.get();
+    const { cardCount, deckId } = Settings.get();
+    const pool = Deck.pool(DECKS, deckId);
     run = {
       endless: cardCount === 0,
-      cards: Deck.deal(PROMPTS, cardCount),
+      pool,
+      cards: Deck.deal(pool, cardCount),
       index: 0,
       results: [],
       shownAt: 0,
@@ -47,12 +49,18 @@
     // ever repeating within a pass.
     if (run.index >= run.cards.length) {
       if (!run.endless) return endRun();
-      run.cards = Deck.deal(PROMPTS, 0);
+      run.cards = Deck.deal(run.pool, 0);
       run.index = 0;
     }
 
+    const card = run.cards[run.index];
     const prompt = el("prompt");
-    prompt.textContent = run.cards[run.index];
+    const scene = el("scene");
+
+    prompt.textContent = card.text;
+    scene.textContent = card.scene || "";
+    scene.hidden = !card.scene;
+
     el("progress").textContent = run.endless
       ? `${run.results.length + 1}`
       : `${run.index + 1} / ${run.cards.length}`;
@@ -69,13 +77,14 @@
   function speakCurrent() {
     if (!run) return;
     const { speakPrompts, voiceURI } = Settings.get();
-    if (speakPrompts) Speech.speak(run.cards[run.index], voiceURI);
+    // Only the line is spoken. The scene is stage direction, not dialogue.
+    if (speakPrompts) Speech.speak(run.cards[run.index].text, voiceURI);
   }
 
   function advance() {
     if (!run) return;
     run.results.push({
-      text: run.cards[run.index],
+      ...run.cards[run.index],
       ms: performance.now() - run.shownAt,
     });
     run.index += 1;
@@ -114,7 +123,13 @@
 
       const text = document.createElement("span");
       text.className = "text";
-      text.textContent = result.text;
+      if (result.scene) {
+        const scene = document.createElement("span");
+        scene.className = "row-scene";
+        scene.textContent = result.scene;
+        text.append(scene);
+      }
+      text.append(document.createTextNode(result.text));
 
       const time = document.createElement("span");
       time.className = "time";
@@ -163,29 +178,66 @@
   // --- Settings screen ----------------------------------------------------
 
   function describeRunShape() {
-    const { cardCount } = Settings.get();
+    const { cardCount, deckId } = Settings.get();
+    const available = Deck.pool(DECKS, deckId).length;
+    const chosen = DECKS.find((deck) => deck.id === Deck.resolve(DECKS, deckId));
+    // A Mixed run draws from every deck, so calling its pool "a deck" would
+    // conflate two distinct terms — see the glossary in CONTEXT.md.
+    const source = chosen ? `the ${chosen.name} deck of ${available}` : `all ${available}`;
+
     el("run-shape").textContent = cardCount === 0
-      ? "Endless — end the run whenever you like."
-      : `${cardCount} cards from a deck of ${PROMPTS.length}.`;
+      ? `Endless, from ${source} — end the run whenever you like.`
+      : `${cardCount} cards from ${source}.`;
   }
 
-  function renderCountOptions() {
-    const container = el("count-options");
+  /**
+   * A row of pill chips where exactly one is pressed. Both selectors are this
+   * same control, so they share a builder.
+   * @param {string} containerId
+   * @param {Array<{value: *, label: string}>} options
+   * @param {*} selected  the value whose chip reads as pressed
+   * @param {(value: *) => void} onPick
+   */
+  function renderChips(containerId, options, selected, onPick) {
+    const container = el(containerId);
     container.replaceChildren();
-    const { cardCount } = Settings.get();
 
-    for (const option of Settings.COUNT_OPTIONS) {
+    for (const option of options) {
       const button = document.createElement("button");
       button.type = "button";
-      button.textContent = option === 0 ? "Endless" : String(option);
-      button.setAttribute("aria-pressed", String(option === cardCount));
+      button.textContent = option.label;
+      button.setAttribute("aria-pressed", String(option.value === selected));
       button.addEventListener("click", () => {
-        Settings.update({ cardCount: option });
-        renderCountOptions();
+        onPick(option.value);
         describeRunShape();
       });
       container.append(button);
     }
+  }
+
+  /** The deck chips on the title screen: each deck, plus Mixed for all of them. */
+  function renderDeckOptions() {
+    const { deckId } = Settings.get();
+    const options = [
+      ...DECKS.map((deck) => ({ value: deck.id, label: deck.name })),
+      { value: Deck.MIXED, label: "Mixed" },
+    ];
+    renderChips("deck-options", options, Deck.resolve(DECKS, deckId), (value) => {
+      Settings.update({ deckId: value });
+      renderDeckOptions();
+    });
+  }
+
+  function renderCountOptions() {
+    const { cardCount } = Settings.get();
+    const options = Settings.COUNT_OPTIONS.map((count) => ({
+      value: count,
+      label: count === 0 ? "Endless" : String(count),
+    }));
+    renderChips("count-options", options, cardCount, (value) => {
+      Settings.update({ cardCount: value });
+      renderCountOptions();
+    });
   }
 
   async function renderVoiceOptions() {
@@ -257,6 +309,7 @@
     if (document.hidden) Speech.cancel();
   });
 
+  renderDeckOptions();
   describeRunShape();
   show("home");
 

@@ -10,6 +10,7 @@ const Settings = (() => {
 
   const DEFAULTS = {
     cardCount: 10,   // cards per run; 0 means endless
+    deckId: Deck.MIXED, // a deck id from prompts.js, or Deck.MIXED for all of them
     voiceURI: null,  // null = let the device choose
     speakPrompts: true,
   };
@@ -21,6 +22,9 @@ const Settings = (() => {
     if (!raw || typeof raw !== "object") return out;
 
     if (COUNT_OPTIONS.includes(raw.cardCount)) out.cardCount = raw.cardCount;
+    // Any string is allowed through: a deck id that no longer exists is Deck's
+    // problem to degrade from, not something to silently rewrite here.
+    if (typeof raw.deckId === "string" && raw.deckId) out.deckId = raw.deckId;
     if (typeof raw.voiceURI === "string") out.voiceURI = raw.voiceURI;
     if (typeof raw.speakPrompts === "boolean") out.speakPrompts = raw.speakPrompts;
 

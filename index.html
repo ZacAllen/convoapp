@@ -23,6 +23,7 @@
       <h1 id="home-title">convoapp</h1>
       <p class="tagline">Answer out loud. Tap for the next one.</p>
     </header>
+    <div id="deck-options" class="choices choices--centred" role="group" aria-label="What to practise"></div>
     <button id="start" class="primary">Start a run</button>
     <p id="run-shape" class="meta"></p>
     <button id="open-settings" class="link">Settings</button>
@@ -33,7 +34,10 @@
 <section id="screen-card" class="screen" hidden aria-labelledby="prompt">
   <button id="quit" class="corner" type="button">End run</button>
   <p id="progress" class="corner corner--left" aria-live="off"></p>
-  <p id="prompt" class="prompt" aria-live="assertive"></p>
+  <div class="card-body">
+    <p id="scene" class="scene" hidden></p>
+    <p id="prompt" class="prompt" aria-live="assertive"></p>
+  </div>
   <p class="hint">Tap anywhere for the next card · long-press to hear it again</p>
 </section>
 
@@ -73,8 +77,8 @@
 </section>
 
 <script src="prompts.js"></script>
-<script src="settings.js"></script>
 <script src="deck.js"></script>
+<script src="settings.js"></script>
 <script src="speech.js"></script>
 <script src="app.js"></script>
 </body>

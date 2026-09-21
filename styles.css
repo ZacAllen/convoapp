@@ -102,6 +102,28 @@ body {
   touch-action: manipulation;
 }
 
+/* Scene and prompt read as one unit, so they live in their own box rather than
+   being separated by the card screen's gap. */
+.card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.scene, .results .row-scene {
+  margin: 0;
+  color: var(--ink-dim);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.scene {
+  font-size: 0.8rem;
+  text-align: center;
+}
+
 .prompt {
   margin: 0;
   max-width: 22ch;
@@ -167,6 +189,12 @@ body {
 
 .results .text { flex: 1; font-size: 0.95rem; }
 
+.results .row-scene {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.68rem;
+}
+
 .results .time {
   color: var(--ink-dim);
   font-size: 0.9rem;
@@ -227,6 +255,10 @@ legend {
   flex-wrap: wrap;
   gap: 8px;
 }
+
+/* On the title screen the chips are the only control of their kind, so they
+   centre rather than sitting left-aligned inside a fieldset. */
+.choices--centred { justify-content: center; }
 
 .choices button {
   min-height: 44px;

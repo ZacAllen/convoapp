@@ -5,7 +5,7 @@
  * to be clever about: everything it needs is in ASSETS. Bump CACHE when any of
  * those files change, or the old copies will keep being served.
  */
-const CACHE = "convoapp-v1";
+const CACHE = "convoapp-v2";
 
 const ASSETS = [
   ".",
